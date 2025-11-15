@@ -23,8 +23,20 @@ export function WaitlistForm() {
     }
 
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      const response = await fetch('/api/waitlist', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to join waitlist')
+      }
+
       setIsSubmitted(true)
       setEmail("")
       // Reset after 5 seconds
@@ -32,7 +44,7 @@ export function WaitlistForm() {
         setIsSubmitted(false)
       }, 5000)
     } catch (err) {
-      setError("Failed to join waitlist. Please try again.")
+      setError(err instanceof Error ? err.message : "Failed to join waitlist. Please try again.")
     } finally {
       setIsLoading(false)
     }
